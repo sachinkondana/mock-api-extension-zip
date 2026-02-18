@@ -1,6 +1,6 @@
-# 🚀 mock-api-extension-zip
+# mock-api-extension-zip
 
-## 📦 Installation Guide (Manual)
+## Installation Guide (Manual)
 
 Since this extension is in development, you need to install it manually using "Developer Mode."
 
@@ -20,9 +20,9 @@ Download and unzip the `extension.zip` file to a folder on your computer.
 2. Click **Load Temporary Add-on...**.
 3. Select the `manifest.json` file from your extracted folder.
 
-## 🛠 Troubleshooting
+## Troubleshooting
 - **Missing manifest.json:** Ensure you selected the inner folder that contains the `manifest.json` file.
 - **Errors on Load:** Check the "Errors" button on the extension card in the browser for specific code issues.
 
-## 📜 License
+## License
 MIT
