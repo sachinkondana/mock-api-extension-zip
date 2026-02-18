@@ -1,0 +1,615 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="sk-mockAPI — Chrome extension to intercept API calls and return mock responses. Test frontends without a backend."
+    />
+    <title>sk-mockAPI — Mock APIs in the browser</title>
+    <link rel="icon" href="assets/favicon.png" type="image/png" sizes="32x32" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&family=Source+Sans+3:ital,wght@0,400;0,500;0,600;1,400&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              accent: '#ff6b00',
+              'accent-hover': '#ff8533',
+              surface: '#161616',
+              card: '#1a1a1a',
+            },
+            fontFamily: {
+              head: ['Outfit', 'sans-serif'],
+              body: ['Source Sans 3', 'sans-serif'],
+            },
+          },
+        },
+      };
+    </script>
+  </head>
+  <body class="min-h-screen bg-[#0d0d0d] text-[#e5e5e5] font-body">
+    <!-- Header -->
+    <header
+      class="sticky top-0 z-50 border-b border-[#2a2a2a] bg-[#0d0d0d]/95 backdrop-blur-sm"
+    >
+      <div
+        class="mx-auto flex h-14 max-w-5xl items-center justify-between px-5 md:px-6"
+      >
+        <a
+          href="index.html"
+          class="inline-flex items-center gap-2.5 font-head text-lg font-bold text-[#e5e5e5] no-underline hover:text-accent"
+        >
+          <img
+            src="assets/logo.png"
+            alt=""
+            class="h-8 w-8 rounded object-contain"
+            width="32"
+            height="32"
+          />
+          <span>sk-mockAPI</span>
+        </a>
+        <nav class="flex items-center gap-6">
+          <a
+            href="#features"
+            class="hidden text-sm font-medium text-[#8c8c8c] no-underline hover:text-[#e5e5e5] sm:block"
+            >Features</a
+          >
+          <a
+            href="#how-it-works"
+            class="hidden text-sm font-medium text-[#8c8c8c] no-underline hover:text-[#e5e5e5] sm:block"
+            >How it works</a
+          >
+          <a
+            href="#how-to-use"
+            class="hidden text-sm font-medium text-[#8c8c8c] no-underline hover:text-[#e5e5e5] sm:block"
+            >How to use</a
+          >
+          <a
+            href="#get-it"
+            class="text-sm font-medium text-accent no-underline hover:text-accent-hover"
+            >Get the extension</a
+          >
+          <a
+            href="blog.html"
+            class="hidden text-sm font-medium text-[#8c8c8c] no-underline hover:text-[#e5e5e5] sm:block"
+            >Blog</a
+          >
+          <a
+            href="privacy.html"
+            class="hidden text-sm font-medium text-[#8c8c8c] no-underline hover:text-[#e5e5e5] sm:block"
+            >Privacy</a
+          >
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <!-- Hero -->
+      <section class="px-5 pb-16 pt-12 md:px-6 md:pb-20 md:pt-16">
+        <div class="mx-auto max-w-4xl text-center">
+          <img
+            src="assets/logo.png"
+            alt="sk-mockAPI"
+            class="mx-auto mb-4 h-14 w-14 rounded-xl object-contain md:h-16 md:w-16"
+            width="64"
+            height="64"
+          />
+          <p
+            class="mb-3 text-xs font-medium uppercase tracking-wider text-[#8c8c8c]"
+          >
+            Chrome extension
+          </p>
+          <h1
+            class="font-head text-3xl font-bold leading-tight tracking-tight text-white md:text-4xl lg:text-5xl"
+          >
+            Mock any API.<br />No backend. No deploy.
+          </h1>
+          <p
+            class="mx-auto mt-4 max-w-xl text-base leading-relaxed text-[#8c8c8c] md:text-lg"
+          >
+            Intercept requests in the browser and return your own responses.
+            Build and test frontends without waiting on APIs.
+          </p>
+          <div class="mt-6 flex flex-wrap justify-center gap-3">
+            <a
+              href="#get-it"
+              class="inline-flex items-center justify-center rounded-lg bg-accent px-6 py-3 text-base font-semibold text-white no-underline transition hover:bg-accent-hover active:scale-[0.98]"
+            >
+              Add to Chrome
+            </a>
+            <a
+              href="#how-it-works"
+              class="inline-flex items-center justify-center rounded-lg border border-[#2a2a2a] bg-transparent px-6 py-3 text-base font-semibold text-[#8c8c8c] no-underline transition hover:border-[#8c8c8c] hover:text-[#e5e5e5] active:scale-[0.98]"
+            >
+              See how it works
+            </a>
+          </div>
+          <div class="mt-10 flex justify-center">
+            <div
+              class="w-full max-w-[520px] overflow-hidden rounded-lg border border-[#2a2a2a] bg-card shadow-xl"
+            >
+              <div
+                class="flex items-center gap-2 border-b border-[#2a2a2a] bg-surface px-3 py-2.5"
+              >
+                <span class="h-2.5 w-2.5 rounded-full bg-[#5a5a5a]"></span>
+                <span class="h-2.5 w-2.5 rounded-full bg-[#5a5a5a]"></span>
+                <span class="h-2.5 w-2.5 rounded-full bg-[#5a5a5a]"></span>
+                <span
+                  class="flex-1 text-center font-mono text-xs text-[#8c8c8c]"
+                  >api.example.com/materials/123</span
+                >
+              </div>
+              <div class="relative p-4">
+                <div
+                  class="absolute right-3 top-2.5 text-[10px] font-semibold uppercase tracking-wider text-accent"
+                >
+                  Mocked by sk-mockAPI
+                </div>
+                <pre
+                  class="m-0 overflow-x-auto rounded-md bg-[#0d0d0d] p-4 text-left font-mono text-xs leading-relaxed text-[#e5e5e5] md:text-sm"
+                ><code class="text-[#a8d4a8]">{
+  "id": "123",
+  "name": "Sample Material",
+  "status": "active"
+}</code></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Features -->
+      <section id="features" class="bg-surface px-6 py-14 md:py-16">
+        <div class="mx-auto max-w-5xl">
+          <h2
+            class="font-head text-2xl font-bold tracking-tight text-white md:text-3xl"
+          >
+            Everything you need to mock
+          </h2>
+          <p class="mt-1.5 max-w-md text-[15px] text-[#8c8c8c]">
+            Control responses per URL, method, and more — all from a simple
+            popup.
+          </p>
+          <ul
+            class="mt-8 grid list-none grid-cols-1 gap-4 p-0 sm:grid-cols-2 lg:grid-cols-4"
+          >
+            <li
+              class="flex min-h-[180px] flex-col rounded-lg border border-[#2a2a2a] bg-card p-5 transition hover:border-[#3a3a3a]"
+            >
+              <span
+                class="mb-3 flex h-9 w-9 items-center justify-center rounded-lg bg-[#252525] text-accent"
+                aria-hidden="true"
+              >
+                <svg
+                  class="h-5 w-5"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244"
+                  />
+                </svg>
+              </span>
+              <h3 class="font-head text-base font-semibold text-white">
+                URL patterns
+              </h3>
+              <p class="mt-1.5 flex-1 text-[13px] leading-snug text-[#8c8c8c]">
+                Match by path:
+                <code
+                  class="rounded bg-[#0d0d0d] px-1 py-0.5 text-[12px] text-accent"
+                  >/api/*</code
+                >,
+                <code
+                  class="rounded bg-[#0d0d0d] px-1 py-0.5 text-[12px] text-accent"
+                  >/materials/*/spec</code
+                >. Only the requests you choose get mocked.
+              </p>
+            </li>
+            <li
+              class="flex min-h-[180px] flex-col rounded-lg border border-[#2a2a2a] bg-card p-5 transition hover:border-[#3a3a3a]"
+            >
+              <span
+                class="mb-3 flex h-9 w-9 items-center justify-center rounded-lg bg-[#252525] text-accent"
+                aria-hidden="true"
+              >
+                <svg
+                  class="h-5 w-5"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"
+                  />
+                </svg>
+              </span>
+              <h3 class="font-head text-base font-semibold text-white">
+                Custom JSON
+              </h3>
+              <p class="mt-1.5 flex-1 text-[13px] leading-snug text-[#8c8c8c]">
+                Set the exact response body, status code, and optional delay for
+                each rule.
+              </p>
+            </li>
+            <li
+              class="flex min-h-[180px] flex-col rounded-lg border border-accent/50 bg-card p-5 shadow-[0_0_0_1px_rgba(255,107,0,0.2)] transition hover:border-accent/70"
+            >
+              <span
+                class="mb-3 flex h-9 w-9 items-center justify-center rounded-lg bg-accent/20 text-accent"
+                aria-hidden="true"
+              >
+                <svg
+                  class="h-5 w-5"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="m3.75 13.5 10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75Z"
+                  />
+                </svg>
+              </span>
+              <h3 class="font-head text-base font-semibold text-white">
+                Toggle on/off
+              </h3>
+              <p class="mt-1.5 flex-1 text-[13px] leading-snug text-[#8c8c8c]">
+                Enable or disable mocking globally with one click. No need to
+                reload the page.
+              </p>
+            </li>
+            <li
+              class="flex min-h-[180px] flex-col rounded-lg border border-[#2a2a2a] bg-card p-5 transition hover:border-[#3a3a3a]"
+            >
+              <span
+                class="mb-3 flex h-9 w-9 items-center justify-center rounded-lg bg-[#252525] text-accent"
+                aria-hidden="true"
+              >
+                <svg
+                  class="h-5 w-5"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M9 12.75 11.25 15 15 9.75m-3.75-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z"
+                  />
+                </svg>
+              </span>
+              <h3 class="font-head text-base font-semibold text-white">
+                Runs locally
+              </h3>
+              <p class="mt-1.5 flex-1 text-[13px] leading-snug text-[#8c8c8c]">
+                All rules live in your browser. No data sent to any server. Open
+                source.
+              </p>
+            </li>
+          </ul>
+
+          <div class="mt-12 rounded-lg border border-[#2a2a2a] bg-card p-6 md:p-8">
+            <h3 class="font-head text-lg font-semibold text-white">
+              Perfect for QA and testing
+            </h3>
+            <p class="mt-2 text-[13px] leading-snug text-[#8c8c8c]">
+              QA can use this extension to check web app behavior with different
+              types of data without actually creating that data in the backend.
+            </p>
+            <ul class="mt-4 list-none space-y-2 p-0 text-[13px] text-[#8c8c8c]">
+              <li class="flex items-start gap-2">
+                <span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-accent"></span>
+                Verify flows with edge-case data (empty lists, errors, long
+                text) by mocking responses — no backend setup needed.
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-accent"></span>
+                Test different scenarios (e.g. success vs. 4xx/5xx) by
+                switching rules or response bodies in the popup.
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-accent"></span>
+                Run consistent test cases across environments without
+                depending on real API data or seed scripts.
+              </li>
+            </ul>
+          </div>
+
+          <div class="mt-6 rounded-lg border border-[#2a2a2a] bg-card p-6 md:p-8">
+            <h3 class="font-head text-lg font-semibold text-white">
+              Perfect for developers
+            </h3>
+            <p class="mt-2 text-[13px] leading-snug text-[#8c8c8c]">
+              Without backend support, you can create API responses without
+              actually running servers or any backend — which speeds up
+              development.
+            </p>
+            <ul class="mt-4 list-none space-y-2 p-0 text-[13px] text-[#8c8c8c]">
+              <li class="flex items-start gap-2">
+                <span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-accent"></span>
+                Build and integrate frontends against realistic responses
+                while the API is still in progress or unavailable.
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-accent"></span>
+                No local servers, no deploy — define URL, method, and JSON in
+                the popup and start developing immediately.
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- How it works -->
+      <section id="how-it-works" class="px-5 py-12 md:px-6 md:py-14">
+        <div class="mx-auto max-w-5xl">
+          <h2
+            class="font-head text-2xl font-bold tracking-tight text-white md:text-3xl"
+          >
+            How it works
+          </h2>
+          <ol class="mt-8 list-none p-0">
+            <li class="mb-6 flex gap-4 last:mb-0 md:mb-8 md:gap-5">
+              <span
+                class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-accent font-head text-sm font-bold text-white"
+                >1</span
+              >
+              <div>
+                <h3 class="font-head text-base font-semibold text-white">
+                  Install the extension
+                </h3>
+                <p class="mt-1 text-[13px] leading-snug text-[#8c8c8c]">
+                  Add sk-mockAPI from the Chrome Web Store or load it unpacked
+                  for development.
+                </p>
+              </div>
+            </li>
+            <li class="mb-6 flex gap-4 last:mb-0 md:mb-8 md:gap-5">
+              <span
+                class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-accent font-head text-sm font-bold text-white"
+                >2</span
+              >
+              <div>
+                <h3 class="font-head text-base font-semibold text-white">
+                  Add rules in the popup
+                </h3>
+                <p class="mt-1 text-[13px] leading-snug text-[#8c8c8c]">
+                  Click the extension icon and define URL patterns, HTTP method,
+                  status code, and response body (JSON).
+                </p>
+              </div>
+            </li>
+            <li class="mb-6 flex gap-4 last:mb-0 md:mb-8 md:gap-5">
+              <span
+                class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-accent font-head text-sm font-bold text-white"
+                >3</span
+              >
+              <div>
+                <h3 class="font-head text-base font-semibold text-white">
+                  Browse as usual
+                </h3>
+                <p class="mt-1 text-[13px] leading-snug text-[#8c8c8c]">
+                  When your app hits a matching request, the extension returns
+                  your mock instead. Toggle mocks on or off anytime.
+                </p>
+              </div>
+            </li>
+          </ol>
+        </div>
+      </section>
+
+      <!-- How to use (screenshots) -->
+      <section id="how-to-use" class="bg-surface px-5 py-12 md:px-6 md:py-14">
+        <div class="mx-auto max-w-5xl">
+          <h2
+            class="font-head text-2xl font-bold tracking-tight text-white md:text-3xl"
+          >
+            How to use it
+          </h2>
+          <p class="mt-1.5 max-w-md text-[15px] text-[#8c8c8c]">
+            Configure mock rules in the extension popup and edit each rule’s
+            URL, method, and response.
+          </p>
+
+          <div class="mt-10 space-y-16 md:mt-14 md:space-y-24">
+            <!-- Step 1: text left, image right -->
+            <div
+              class="flex flex-col gap-8 md:flex-row md:items-center md:gap-12"
+            >
+              <div class="min-w-0 flex-1 md:order-1 md:max-w-[42%]">
+                <span
+                  class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-accent/20 font-head text-sm font-bold text-accent"
+                  aria-hidden="true"
+                  >1</span
+                >
+                <h3 class="mt-3 font-head text-lg font-semibold text-white">
+                  Popup: groups and global toggle
+                </h3>
+                <p class="mt-2 text-[14px] leading-relaxed text-[#8c8c8c]">
+                  Click the extension icon to open the popup. Use the global
+                  toggle to enable or disable all mocks. Organize rules in groups
+                  (e.g. Ungrouped, TODO API). Use
+                  <strong class="text-[#e5e5e5]">Add group</strong> or
+                  <strong class="text-[#e5e5e5]">+ Add API</strong> to create
+                  new groups or rules.
+                </p>
+              </div>
+              <div
+                class="flex-1 overflow-hidden rounded-xl border border-[#2a2a2a] bg-[#0d0d0d] shadow-[0_8px_30px_rgba(0,0,0,0.4)] md:order-2 md:max-w-[58%]"
+              >
+                <img
+                  src="assets/popup-list.png"
+                  alt="sk-mockAPI popup with global toggle, Ungrouped and TODO API groups"
+                  class="w-full"
+                  width="780"
+                  height="600"
+                />
+              </div>
+            </div>
+
+            <!-- Step 2: image left, text right (zigzag) -->
+            <div
+              class="flex flex-col gap-8 md:flex-row md:items-center md:gap-12"
+            >
+              <div
+                class="flex-1 overflow-hidden rounded-xl border border-[#2a2a2a] bg-[#0d0d0d] shadow-[0_8px_30px_rgba(0,0,0,0.4)] md:order-1 md:max-w-[58%]"
+              >
+                <img
+                  src="assets/popup-rules.png"
+                  alt="sk-mockAPI popup with TODO API group expanded, showing List TODO and GET TODO rules"
+                  class="w-full"
+                  width="780"
+                  height="600"
+                />
+              </div>
+              <div class="min-w-0 flex-1 md:order-2 md:max-w-[42%]">
+                <span
+                  class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-accent/20 font-head text-sm font-bold text-accent"
+                  aria-hidden="true"
+                  >2</span
+                >
+                <h3 class="mt-3 font-head text-lg font-semibold text-white">
+                  Popup: list of rules in a group
+                </h3>
+                <p class="mt-2 text-[14px] leading-relaxed text-[#8c8c8c]">
+                  Expand a group to see its mock APIs. Each row shows the rule
+                  label, URL, and HTTP method. Turn a rule on or off with its
+                  switch. Use the copy and delete icons to duplicate or remove a
+                  rule.
+                </p>
+              </div>
+            </div>
+
+            <!-- Step 3: text left, image right -->
+            <div
+              class="flex flex-col gap-8 md:flex-row md:items-center md:gap-12"
+            >
+              <div class="min-w-0 flex-1 md:order-1 md:max-w-[42%]">
+                <span
+                  class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-accent/20 font-head text-sm font-bold text-accent"
+                  aria-hidden="true"
+                  >3</span
+                >
+                <h3 class="mt-3 font-head text-lg font-semibold text-white">
+                  Editing a rule: URL, method, response
+                </h3>
+                <p class="mt-2 text-[14px] leading-relaxed text-[#8c8c8c]">
+                  Expand a row to configure it: set the
+                  <strong class="text-[#e5e5e5]">URL pattern</strong> (e.g.
+                  <code
+                    class="rounded bg-[#0d0d0d] px-1.5 py-0.5 text-[12px] text-accent"
+                    >/api/*</code
+                  >), choose the
+                  <strong class="text-[#e5e5e5]">HTTP method</strong> (GET,
+                  POST, etc.), and optionally set status code and delay. In
+                  <strong class="text-[#e5e5e5]">Response payload</strong>,
+                  switch between Format, Raw, and Tree and enter the JSON body
+                  that the mock should return.
+                </p>
+              </div>
+              <div
+                class="flex-1 overflow-hidden rounded-xl border border-[#2a2a2a] bg-[#0d0d0d] shadow-[0_8px_30px_rgba(0,0,0,0.4)] md:order-2 md:max-w-[58%]"
+              >
+                <img
+                  src="assets/rule-editor.png"
+                  alt="Expanded mock rule editor with URL, method, status, delay, and response payload in Tree view"
+                  class="w-full"
+                  width="780"
+                  height="400"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CTA -->
+      <section id="get-it" class="bg-surface px-5 py-14 md:px-6 md:py-16">
+        <div class="mx-auto max-w-5xl text-center">
+          <h2
+            class="font-head text-2xl font-bold tracking-tight text-white md:text-3xl"
+          >
+            Ready to mock?
+          </h2>
+          <p class="mt-1.5 text-[15px] text-[#8c8c8c] md:text-base">
+            Install the extension and start returning mock responses in seconds.
+          </p>
+          <div class="mt-5 flex flex-wrap justify-center gap-3">
+            <a
+              href="#"
+              id="chrome-store-link"
+              target="_blank"
+              rel="noopener"
+              class="inline-flex items-center justify-center rounded-lg bg-accent px-6 py-3.5 text-base font-semibold text-white no-underline transition hover:bg-accent-hover active:scale-[0.98]"
+            >
+              Add to Chrome
+            </a>
+            <a
+              href="https://github.com/sachinkondana/mock-api-extension-zip"
+              target="_blank"
+              rel="noopener"
+              class="inline-flex items-center justify-center rounded-lg border border-[#2a2a2a] bg-transparent px-6 py-3.5 text-base font-semibold text-[#8c8c8c] no-underline transition hover:border-[#8c8c8c] hover:text-[#e5e5e5] active:scale-[0.98]"
+            >
+              Download (zip)
+            </a>
+          </div>
+          <p class="mt-4 text-[13px] text-[#8c8c8c]">
+            Not in the Store yet?
+            <a
+              href="https://github.com/sachinkondana/mock-api-extension-zip"
+              target="_blank"
+              rel="noopener"
+              class="font-medium text-accent no-underline hover:text-accent-hover"
+            >Download the extension zip</a
+            >
+            from GitHub, or build from the repo and load unpacked from
+            <code
+              class="rounded bg-[#0d0d0d] px-1.5 py-0.5 text-[12px] text-accent"
+              >dist/extension</code
+            >.
+          </p>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-[#2a2a2a] px-5 py-6 md:px-6">
+      <div
+        class="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-3"
+      >
+        <div class="flex items-center gap-4">
+          <p class="m-0 font-head text-base font-semibold text-[#8c8c8c]">
+            sk-mockAPI
+          </p>
+          <a
+            href="privacy.html"
+            class="text-sm text-[#8c8c8c] no-underline hover:text-accent"
+          >
+            Privacy
+          </a>
+        </div>
+        <p class="m-0 text-sm text-[#8c8c8c]">
+          Developed by <strong class="text-[#e5e5e5]">sachinkondana</strong>
+        </p>
+      </div>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,8 @@
+{
+  "name": "sk-mock-api-extension",
+  "version": "1.0.0",
+  "description": "Chrome extension to intercept API calls and return mock responses",
+  "scripts": {
+    "build": "node scripts/build-extension.js"
+  }
+}

@@ -1,0 +1,1033 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        width: 780px;
+        min-width: 780px;
+        height: 600px;
+        min-height: 600px;
+        padding: 0;
+        margin: 0;
+        font-family:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        font-size: 13px;
+        color: #333;
+        display: flex;
+        flex-direction: column;
+      }
+      .header {
+        padding: 12px 16px;
+        border-bottom: 1px solid #e0e0e0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-shrink: 0;
+        background: #fafafa;
+      }
+      .header-left {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .header-logo {
+        width: 32px;
+        height: 32px;
+        border-radius: 6px;
+        object-fit: contain;
+        flex-shrink: 0;
+      }
+      .header h1 {
+        font-size: 16px;
+        font-weight: 600;
+        margin: 0;
+        color: #333;
+      }
+      .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .btn-icon {
+        width: 32px;
+        height: 32px;
+        border: none;
+        background: transparent;
+        border-radius: 6px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #555;
+      }
+      .btn-icon:hover {
+        background: #eee;
+        color: #333;
+      }
+      .btn-icon.primary {
+        background: #ff6b00;
+        color: white;
+      }
+      .btn-icon.primary:hover {
+        background: #e55f00;
+      }
+      .status-badge {
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 11px;
+        font-weight: 600;
+      }
+      .status-badge.enabled {
+        background: #4caf50;
+        color: white;
+      }
+      .status-badge.disabled {
+        background: #f44336;
+        color: white;
+      }
+      .toggle-switch {
+        position: relative;
+        width: 44px;
+        height: 24px;
+        flex-shrink: 0;
+      }
+      .toggle-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+      .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        border-radius: 24px;
+        transition: 0.3s;
+      }
+      .slider:before {
+        position: absolute;
+        content: '';
+        height: 18px;
+        width: 18px;
+        left: 3px;
+        bottom: 3px;
+        background: white;
+        border-radius: 50%;
+        transition: 0.3s;
+      }
+      input:checked + .slider {
+        background-color: #ff6b00;
+      }
+      input:checked + .slider:before {
+        transform: translateX(20px);
+      }
+      .api-list {
+        flex: 1;
+        overflow-y: auto;
+        padding: 8px;
+      }
+      .api-group {
+        margin-bottom: 16px;
+        border: 1px solid #e5e5e5;
+        border-radius: 8px;
+        background: #fafafa;
+        overflow: hidden;
+      }
+      .api-group.collapsed .api-group-cards {
+        display: none;
+      }
+      .api-group-header {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 10px;
+        background: #f0f0f0;
+        border-bottom: 1px solid #e5e5e5;
+        cursor: default;
+        user-select: none;
+      }
+      .api-group.collapsed .api-group-header {
+        border-bottom: none;
+      }
+      .api-group-drag-handle {
+        width: 24px;
+        height: 24px;
+        padding: 0;
+        border: none;
+        border-radius: 4px;
+        background: transparent;
+        color: #888;
+        cursor: grab;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+      .api-group-drag-handle:hover {
+        color: #555;
+        background: #e0e0e0;
+      }
+      .api-group-drag-handle:active {
+        cursor: grabbing;
+      }
+      .api-group-collapse {
+        width: 24px;
+        height: 24px;
+        padding: 0;
+        border: none;
+        border-radius: 4px;
+        background: transparent;
+        color: #666;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        font-size: 12px;
+      }
+      .api-group-collapse:hover {
+        background: #e0e0e0;
+      }
+      .api-group-title {
+        flex: 1;
+        min-width: 0;
+        font-size: 13px;
+        font-weight: 600;
+        color: #333;
+        padding: 2px 6px;
+        margin: 0;
+        border: 1px solid transparent;
+        border-radius: 4px;
+      }
+      .api-group-title:hover {
+        background: #fff;
+        border-color: #ddd;
+      }
+      .api-group-title[contenteditable]:focus {
+        outline: none;
+        border-color: #ff6b00;
+        background: #fff;
+      }
+      .api-group-count {
+        font-size: 11px;
+        color: #888;
+        font-weight: normal;
+      }
+      .api-group-toggle-wrap {
+        display: flex;
+        align-items: center;
+        flex-shrink: 0;
+      }
+      .api-group-toggle-wrap .toggle-switch {
+        width: 40px;
+        height: 22px;
+      }
+      .api-group-toggle-wrap .slider:before {
+        height: 16px;
+        width: 16px;
+        transform: translateX(0);
+      }
+      .api-group-toggle-wrap input:checked + .slider:before {
+        transform: translateX(18px);
+      }
+      .api-group-actions {
+        display: flex;
+        align-items: center;
+        gap: 2px;
+      }
+      .api-group-add-api {
+        padding: 4px 8px;
+        font-size: 11px;
+        border-radius: 4px;
+        border: 1px solid #ddd;
+        background: #fff;
+        color: #333;
+        cursor: pointer;
+      }
+      .api-group-add-api:hover {
+        background: #f5f5f5;
+        border-color: #ff6b00;
+        color: #ff6b00;
+      }
+      .api-group-delete {
+        width: 26px;
+        height: 26px;
+        padding: 0;
+        border: none;
+        border-radius: 4px;
+        background: transparent;
+        color: #888;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .api-group-delete:hover {
+        background: #ffebee;
+        color: #c62828;
+      }
+      .api-group-cards {
+        padding: 8px;
+        min-height: 4px;
+      }
+      .api-group-cards.drop-target {
+        background: rgba(255, 107, 0, 0.08);
+        border-radius: 4px;
+      }
+      .api-group.dragging {
+        opacity: 0.6;
+      }
+      .api-group.drop-target-group {
+        border-color: #ff6b00;
+        box-shadow: 0 0 0 2px rgba(255, 107, 0, 0.2);
+      }
+      .api-card {
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 10px 12px;
+        margin-bottom: 8px;
+        background: #fff;
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+      }
+      .api-card.dragging {
+        opacity: 0.5;
+      }
+      .api-card.drop-target {
+        border-color: #ff6b00;
+        box-shadow: 0 0 0 2px rgba(255, 107, 0, 0.2);
+      }
+      .api-card .card-drag-handle {
+        width: 24px;
+        height: 28px;
+        padding: 0;
+        border: none;
+        border-radius: 4px;
+        background: transparent;
+        color: #999;
+        cursor: grab;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+      .api-card .card-drag-handle:hover {
+        color: #666;
+        background: #eee;
+      }
+      .api-card .card-drag-handle:active {
+        cursor: grabbing;
+      }
+      .api-card .card-row {
+        display: flex;
+        align-items: flex-end;
+        gap: 8px;
+        flex-wrap: nowrap;
+      }
+      .api-card .card-main {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+      .api-card .card-label {
+        font-size: 11px;
+        color: #666;
+        line-height: 1.2;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .api-card .card-label:empty {
+        display: none;
+      }
+      .api-card .card-label:empty + .row-url::before {
+        content: none;
+      }
+      .api-card .row-input {
+        padding: 6px 8px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 12px;
+        font-family: inherit;
+        background: #fff;
+      }
+      .api-card .row-input:focus {
+        outline: none;
+        border-color: #ff6b00;
+      }
+      .api-card .row-url {
+        flex: 1;
+        min-width: 0;
+        width: 100%;
+      }
+      .api-card .row-method {
+        width: 72px;
+        flex-shrink: 0;
+      }
+      .api-card .row-status {
+        width: 52px;
+        flex-shrink: 0;
+      }
+      .api-card .row-delay {
+        width: 52px;
+        flex-shrink: 0;
+      }
+      .api-card .row-label {
+        flex: 1;
+        min-width: 80px;
+      }
+      .api-card .card-expanded {
+        display: none;
+        margin-top: 10px;
+        padding-top: 10px;
+        border-top: 1px solid #e8e8e8;
+        width: 100%;
+      }
+      .api-card.expanded .card-expanded {
+        display: block;
+      }
+      .api-card .card-expanded .card-expanded-row {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        flex-wrap: wrap;
+        margin-bottom: 8px;
+      }
+      .api-card .btn-row-duplicate,
+      .api-card .btn-row-delete {
+        width: 28px;
+        height: 28px;
+        padding: 0;
+        border: none;
+        border-radius: 4px;
+        background: transparent;
+        color: #555;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+      .api-card .btn-row-duplicate:hover {
+        background: #eee;
+        color: #333;
+      }
+      .api-card .btn-row-delete:hover {
+        background: #ffebee;
+        color: #c62828;
+      }
+      .btn-add-group {
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        border: 1px solid #ddd;
+        background: #fff;
+        color: #333;
+      }
+      .btn-add-group:hover {
+        background: #f5f5f5;
+        border-color: #ff6b00;
+        color: #ff6b00;
+      }
+      .api-card .expand-btn {
+        width: 28px;
+        height: 28px;
+        border: none;
+        background: transparent;
+        border-radius: 4px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #666;
+        flex-shrink: 0;
+        transition: transform 0.2s;
+      }
+      .api-card .expand-btn:hover {
+        background: #eee;
+        color: #333;
+      }
+      .api-card .expand-icon {
+        font-size: 14px;
+        display: inline-block;
+        min-width: 1em;
+        text-align: center;
+        line-height: 1;
+      }
+      .api-card .response-panel {
+        margin-top: 8px;
+        width: 100%;
+      }
+      .api-card .response-panel-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 6px;
+      }
+      .api-card .response-panel-label {
+        font-size: 10px;
+        color: #888;
+      }
+      .api-card .response-panel-actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .api-card .btn-response-format {
+        padding: 4px 10px;
+        border-radius: 4px;
+        font-size: 11px;
+        font-weight: 500;
+        cursor: pointer;
+        border: 1px solid #ddd;
+        background: #f5f5f5;
+        color: #333;
+      }
+      .api-card .btn-response-format:hover {
+        background: #eee;
+      }
+      .response-view-toggle {
+        display: inline-flex;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        overflow: hidden;
+        background: #f5f5f5;
+      }
+      .api-card .btn-response-tree,
+      .api-card .btn-response-raw {
+        padding: 4px 12px;
+        font-size: 11px;
+        font-weight: 500;
+        cursor: pointer;
+        border: none;
+        border-radius: 0;
+        background: transparent;
+        color: #333;
+        margin: 0;
+      }
+      .api-card .btn-response-raw {
+        border-right: 1px solid #ddd;
+      }
+      .api-card .btn-response-tree:hover,
+      .api-card .btn-response-raw:hover {
+        background: #eee;
+      }
+      .api-card .response-panel.tree-mode .btn-response-tree {
+        background: #ff6b00;
+        color: white;
+        border-color: transparent;
+      }
+      .api-card .response-panel.tree-mode .btn-response-tree:hover {
+        background: #e55f00;
+        color: white;
+      }
+      .api-card .response-panel.raw-mode .btn-response-raw {
+        background: #ff6b00;
+        color: white;
+      }
+      .api-card .response-panel.raw-mode .btn-response-raw:hover {
+        background: #e55f00;
+        color: white;
+      }
+      .api-card .btn-response-update {
+        background: #ff6b00;
+        border-color: #ff6b00;
+        color: white;
+      }
+      .api-card .btn-response-update:hover {
+        background: #e55f00;
+        border-color: #e55f00;
+      }
+      .api-card .response-body-edit {
+        width: 100%;
+        margin: 0;
+        padding: 10px;
+        background: #f8f8f8;
+        border: 1px solid #e0e0e0;
+        border-radius: 6px;
+        font-size: 11px;
+        font-family: ui-monospace, monospace;
+        line-height: 1.4;
+        resize: vertical;
+        min-height: 60px;
+        max-height: 400px;
+        color: #333;
+        box-sizing: border-box;
+      }
+      .api-card .response-body-edit:focus {
+        outline: none;
+        border-color: #ff6b00;
+        background: #fff;
+      }
+      .api-card .response-panel-status {
+        font-size: 11px;
+        margin-top: 6px;
+        min-height: 16px;
+      }
+      .api-card .response-panel-status.success {
+        color: #2e7d32;
+      }
+      .api-card .response-panel-status.error {
+        color: #c62828;
+      }
+      .api-card .response-body-tree {
+        display: none;
+        min-height: 60px;
+        max-height: 400px;
+        overflow: auto;
+        padding: 10px;
+        background: #f8f8f8;
+        border: 1px solid #e0e0e0;
+        border-radius: 6px;
+        font-size: 12px;
+        font-family: ui-monospace, monospace;
+        line-height: 1.5;
+        color: #333;
+      }
+      .api-card .response-panel.tree-mode .response-body-edit {
+        display: none;
+      }
+      .api-card .response-panel.tree-mode .response-body-tree {
+        display: block;
+      }
+      .json-tree {
+        padding-left: 0;
+        margin: 0;
+        list-style: none;
+      }
+      .json-tree-root {
+        padding-left: 0;
+      }
+      .json-tree-node {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+      .json-tree-row {
+        display: flex;
+        align-items: flex-start;
+        gap: 4px;
+        min-height: 20px;
+        cursor: default;
+        user-select: text;
+      }
+      .json-tree-row:hover {
+        background: rgba(0, 0, 0, 0.04);
+      }
+      .json-tree-toggle {
+        flex-shrink: 0;
+        width: 16px;
+        color: #666;
+        cursor: pointer;
+        font-size: 10px;
+        line-height: 20px;
+      }
+      .json-tree-toggle:hover {
+        color: #333;
+      }
+      .json-tree-toggle.empty {
+        cursor: default;
+        color: transparent;
+      }
+      .json-tree-toggle.empty::before {
+        content: none;
+      }
+      .json-tree-key {
+        color: #881391;
+        flex-shrink: 0;
+      }
+      .json-tree-key::after {
+        content: ': ';
+        color: #333;
+      }
+      .json-tree-value {
+        word-break: break-all;
+      }
+      .json-tree-value.string {
+        color: #0a22a0;
+      }
+      .json-tree-value.number {
+        color: #1c00cf;
+      }
+      .json-tree-value.boolean {
+        color: #0d22d0;
+      }
+      .json-tree-value.null {
+        color: #808080;
+      }
+      .json-tree-badge {
+        font-size: 10px;
+        color: #666;
+        margin-left: 4px;
+      }
+      .json-tree-children {
+        padding-left: 18px;
+        border-left: 1px solid #e0e0e0;
+        margin-left: 6px;
+      }
+      .json-tree-node.collapsed .json-tree-children {
+        display: none;
+      }
+      .json-tree-toggle::before {
+        display: inline-block;
+        width: 1em;
+        text-align: center;
+        font-size: 12px;
+      }
+      .json-tree-node.collapsed > .json-tree-row .json-tree-toggle::before {
+        content: '▶';
+      }
+      .json-tree-node:not(.collapsed)
+        > .json-tree-row
+        .json-tree-toggle::before {
+        content: '▼';
+      }
+      .method-pill {
+        padding: 3px 8px;
+        border-radius: 4px;
+        font-size: 11px;
+        font-weight: 600;
+        color: white;
+        flex-shrink: 0;
+      }
+      .method-pill.GET {
+        background: #4caf50;
+      }
+      .method-pill.POST {
+        background: #ff9800;
+      }
+      .method-pill.PUT {
+        background: #2196f3;
+      }
+      .method-pill.PATCH {
+        background: #9c27b0;
+      }
+      .method-pill.DELETE {
+        background: #f44336;
+      }
+      .api-card .toggle-switch {
+        width: 40px;
+        height: 22px;
+      }
+      .api-card .slider:before {
+        height: 16px;
+        width: 16px;
+      }
+      input:checked + .slider:before {
+        transform: translateX(18px);
+      }
+      .menu-btn {
+        width: 28px;
+        height: 28px;
+        border: none;
+        background: transparent;
+        border-radius: 4px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #666;
+        flex-shrink: 0;
+      }
+      .menu-btn:hover {
+        background: #eee;
+      }
+      .menu-dropdown {
+        display: none;
+        position: absolute;
+        right: 0;
+        top: 100%;
+        margin-top: 4px;
+        background: white;
+        border: 1px solid #e0e0e0;
+        border-radius: 6px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        z-index: 10;
+        min-width: 120px;
+      }
+      .menu-dropdown.show {
+        display: block;
+      }
+      .menu-dropdown button {
+        display: block;
+        width: 100%;
+        padding: 8px 12px;
+        border: none;
+        background: none;
+        text-align: left;
+        cursor: pointer;
+        font-size: 13px;
+        color: #333;
+      }
+      .menu-dropdown button:hover {
+        background: #f5f5f5;
+      }
+      .menu-dropdown button.remove {
+        color: #f44336;
+      }
+      .card-actions {
+        position: relative;
+      }
+      .empty-state {
+        padding: 32px 16px;
+        text-align: center;
+        color: #888;
+        font-size: 13px;
+      }
+      .empty-state p {
+        margin: 0 0 12px 0;
+      }
+      /* Modal */
+      .modal-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.4);
+        z-index: 100;
+        align-items: center;
+        justify-content: center;
+      }
+      .modal-overlay.show {
+        display: flex;
+      }
+      .modal {
+        background: white;
+        border-radius: 10px;
+        width: 96%;
+        max-width: 480px;
+        max-height: 90%;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+      }
+      .modal-header {
+        padding: 14px 16px;
+        border-bottom: 1px solid #e0e0e0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .modal-header h2 {
+        font-size: 15px;
+        margin: 0;
+        font-weight: 600;
+      }
+      .modal-close {
+        width: 28px;
+        height: 28px;
+        border: none;
+        background: transparent;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 18px;
+        color: #666;
+        line-height: 1;
+      }
+      .modal-close:hover {
+        background: #eee;
+        color: #333;
+      }
+      .modal-body {
+        padding: 16px;
+        overflow-y: auto;
+        flex: 1;
+      }
+      .form-group {
+        margin-bottom: 14px;
+      }
+      .form-group label {
+        display: block;
+        font-size: 12px;
+        font-weight: 500;
+        color: #555;
+        margin-bottom: 4px;
+      }
+      .form-group input,
+      .form-group select,
+      .form-group textarea {
+        width: 100%;
+        padding: 8px 10px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        font-size: 13px;
+        font-family: inherit;
+      }
+      .form-group textarea {
+        min-height: 120px;
+        resize: vertical;
+      }
+      .url-row {
+        display: flex;
+        gap: 6px;
+        align-items: center;
+      }
+      .url-row input {
+        flex: 1;
+      }
+      .url-hint {
+        font-size: 11px;
+        color: #888;
+        margin-top: 4px;
+      }
+      .modal-footer {
+        padding: 12px 16px;
+        border-top: 1px solid #e0e0e0;
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+      }
+      .btn {
+        padding: 8px 16px;
+        border-radius: 6px;
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        border: none;
+      }
+      .btn-secondary {
+        background: #f0f0f0;
+        color: #333;
+      }
+      .btn-secondary:hover {
+        background: #e5e5e5;
+      }
+      .btn-primary {
+        background: #ff6b00;
+        color: white;
+      }
+      .btn-primary:hover {
+        background: #e55f00;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <div class="header-left">
+        <img
+          src="../icons/sk-mockAPI.png"
+          alt=""
+          class="header-logo"
+          width="32"
+          height="32"
+        />
+        <h1>sk-mockAPI(developed by sachinkondana)</h1>
+        <span class="status-badge" id="statusBadge">Loading...</span>
+        <label class="toggle-switch" title="Enable mock interception">
+          <input type="checkbox" id="globalToggle" />
+          <span class="slider"></span>
+        </label>
+      </div>
+      <div class="header-actions">
+        <button
+          type="button"
+          class="btn-add-group"
+          id="btnAddGroup"
+          title="Add group"
+        >
+          Add group
+        </button>
+      </div>
+    </div>
+
+    <div class="api-list" id="apiList">
+      <div class="empty-state" id="emptyState">
+        <p>No mock APIs yet.</p>
+        <p>Use <strong>+ Add API</strong> in a section to add one.</p>
+      </div>
+      <div id="apiCards"></div>
+    </div>
+
+    <div class="modal-overlay" id="modalOverlay">
+      <div class="modal">
+        <div class="modal-header">
+          <h2 id="modalTitle">Add API</h2>
+          <button type="button" class="modal-close" id="modalClose">
+            &times;
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label>URL pattern</label>
+            <div class="url-row">
+              <input
+                type="text"
+                id="editUrl"
+                placeholder="Any domain, e.g. https://auth-service.com/login or /materials/*"
+              />
+              <button
+                type="button"
+                class="btn-icon"
+                id="btnWildcardHint"
+                title="Use * for one path segment"
+              >
+                *
+              </button>
+            </div>
+            <div class="url-hint">
+              Use any domain. Use * for one path segment (e.g. /materials/* or
+              https://api.example.com/users/*).
+            </div>
+          </div>
+          <div class="form-group">
+            <label>HTTP Method</label>
+            <select id="editMethod">
+              <option value="GET">GET</option>
+              <option value="POST">POST</option>
+              <option value="PUT">PUT</option>
+              <option value="PATCH">PATCH</option>
+              <option value="DELETE">DELETE</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Status code</label>
+            <input
+              type="number"
+              id="editStatusCode"
+              value="200"
+              min="100"
+              max="599"
+            />
+          </div>
+          <div class="form-group">
+            <label>Delay (ms)</label>
+            <input type="number" id="editDelay" value="0" min="0" />
+          </div>
+          <div class="form-group">
+            <label>Label (optional)</label>
+            <input type="text" id="editLabel" placeholder="Description" />
+          </div>
+          <div class="form-group">
+            <label>Response payload (JSON)</label>
+            <textarea
+              id="editResponseBody"
+              placeholder='{"id": "..."}'
+            ></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="modalCancel">
+            Cancel
+          </button>
+          <button type="button" class="btn btn-primary" id="modalSave">
+            Save
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script src="popup.js"></script>
+  </body>
+</html>

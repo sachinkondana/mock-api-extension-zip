@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="How sk-mockAPI started — the backstory of building a browser extension to mock APIs without VPN or backend."
+    />
+    <title>How it started — sk-mockAPI</title>
+    <link rel="icon" href="assets/favicon.png" type="image/png" sizes="32x32" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&family=Source+Sans+3:ital,wght@0,400;0,500;0,600;1,400&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              accent: '#ff6b00',
+              'accent-hover': '#ff8533',
+              surface: '#161616',
+              card: '#1a1a1a',
+            },
+            fontFamily: {
+              head: ['Outfit', 'sans-serif'],
+              body: ['Source Sans 3', 'sans-serif'],
+            },
+          },
+        },
+      };
+    </script>
+  </head>
+  <body class="min-h-screen bg-[#0d0d0d] text-[#e5e5e5] font-body">
+    <!-- Header -->
+    <header
+      class="sticky top-0 z-50 border-b border-[#2a2a2a] bg-[#0d0d0d]/95 backdrop-blur-sm"
+    >
+      <div
+        class="mx-auto flex h-14 max-w-5xl items-center justify-between px-5 md:px-6"
+      >
+        <a
+          href="index.html"
+          class="inline-flex items-center gap-2.5 font-head text-lg font-bold text-[#e5e5e5] no-underline hover:text-accent"
+        >
+          <img
+            src="assets/logo.png"
+            alt=""
+            class="h-8 w-8 rounded object-contain"
+            width="32"
+            height="32"
+          />
+          <span>sk-mockAPI</span>
+        </a>
+        <nav class="flex items-center gap-6">
+          <a
+            href="index.html#features"
+            class="hidden text-sm font-medium text-[#8c8c8c] no-underline hover:text-[#e5e5e5] sm:block"
+            >Features</a
+          >
+          <a
+            href="index.html#how-it-works"
+            class="hidden text-sm font-medium text-[#8c8c8c] no-underline hover:text-[#e5e5e5] sm:block"
+            >How it works</a
+          >
+          <a
+            href="index.html#how-to-use"
+            class="hidden text-sm font-medium text-[#8c8c8c] no-underline hover:text-[#e5e5e5] sm:block"
+            >How to use</a
+          >
+          <a
+            href="index.html#get-it"
+            class="hidden text-sm font-medium text-[#8c8c8c] no-underline hover:text-[#e5e5e5] sm:block"
+            >Get the extension</a
+          >
+          <a
+            href="blog.html"
+            class="text-sm font-medium text-accent no-underline hover:text-accent-hover"
+            >Blog</a
+          >
+          <a
+            href="privacy.html"
+            class="hidden text-sm font-medium text-[#8c8c8c] no-underline hover:text-[#e5e5e5] sm:block"
+            >Privacy</a
+          >
+        </nav>
+      </div>
+    </header>
+
+    <main class="px-5 py-12 md:px-6 md:py-16">
+      <article class="mx-auto max-w-2xl">
+        <p
+          class="mb-2 text-xs font-medium uppercase tracking-wider text-[#8c8c8c]"
+        >
+          Blog
+        </p>
+        <h1
+          class="font-head text-3xl font-bold leading-tight tracking-tight text-white md:text-4xl"
+        >
+          How sk-mockAPI started
+        </h1>
+        <p class="mt-3 text-[15px] text-[#8c8c8c]">
+          A short backstory of why this extension exists.
+        </p>
+
+        <hr class="my-10 border-[#2a2a2a]" />
+
+        <div class="prose prose-invert max-w-none">
+          <h2 class="font-head text-xl font-semibold text-white mt-10 mb-4">
+            The problem
+          </h2>
+          <p class="text-[15px] leading-relaxed text-[#c5c5c5] mt-4">
+            A few things were stacking up:
+          </p>
+          <p class="mt-4 font-medium text-[#e5e5e5]">Access &amp; tools</p>
+          <p class="mt-1 text-[15px] leading-relaxed text-[#c5c5c5]">
+            I needed VPN to reach our APIs and internal services. But inside the
+            VPN, the coding agents I relied on were blocked. So it was either
+            “see the APIs” or “use the agent”—not both. That put a real brake on
+            how fast we could move.
+          </p>
+          <p class="mt-4 font-medium text-[#e5e5e5]">API vs frontend timing</p>
+          <p class="mt-1 text-[15px] leading-relaxed text-[#c5c5c5]">
+            On paper, API and frontend work started in parallel. In practice,
+            the frontend was usually waiting. The API often landed on the last
+            day of the sprint—or the day before demos. So instead of building and
+            testing against real contracts, the FE team was stuck with
+            placeholders, guesswork, and last-minute integration.
+          </p>
+          <p class="mt-4 font-medium text-[#e5e5e5]">Result</p>
+          <p class="mt-1 text-[15px] leading-relaxed text-[#c5c5c5]">
+            Developers were struggling to get momentum. We were blocked by
+            access, by tooling, and by the classic “API not ready yet” delay.
+          </p>
+
+          <hr class="my-10 border-[#2a2a2a]" />
+
+          <h2 class="font-head text-xl font-semibold text-white mt-10 mb-4">
+            The idea
+          </h2>
+          <p class="text-[15px] leading-relaxed text-[#c5c5c5] mt-4">
+            We needed a way to:
+          </p>
+          <ul class="mt-4 list-none space-y-2 p-0 text-[15px] leading-relaxed text-[#c5c5c5]">
+            <li class="flex items-start gap-2">
+              <span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-accent"></span>
+              Work <strong class="text-[#e5e5e5]">without</strong> depending on VPN or a live backend.
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-accent"></span>
+              Let the frontend <strong class="text-[#e5e5e5]">move ahead</strong> with realistic request/response shapes.
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-accent"></span>
+              Give QA (and devs) a way to <strong class="text-[#e5e5e5]">try different data</strong> without creating it in the backend.
+            </li>
+          </ul>
+          <p class="mt-6 text-[15px] leading-relaxed text-[#c5c5c5]">
+            So the idea was simple: <strong class="text-[#e5e5e5]">mock the APIs in the browser.</strong> No separate server, no deploy, no VPN. Just a small tool that intercepts requests and returns the JSON you define.
+          </p>
+
+          <hr class="my-10 border-[#2a2a2a]" />
+
+          <h2 class="font-head text-xl font-semibold text-white mt-10 mb-4">
+            How it got built
+          </h2>
+          <p class="mt-4 text-[15px] leading-relaxed text-[#c5c5c5]">
+            I couldn’t use the coding agent inside VPN, so I used it
+            <strong class="text-[#e5e5e5]">outside</strong> VPN to design and build the first version of this
+            <strong class="text-[#e5e5e5]">browser extension</strong>. It was the right fit: it runs locally, doesn’t need any backend, and gives both developers and QA a single place to define and toggle mock APIs.
+          </p>
+          <p class="mt-4 text-[15px] leading-relaxed text-[#c5c5c5]">
+            That’s how <strong class="text-[#e5e5e5]">sk-mockAPI</strong> started: from access limits, sprint-time pressure, and the need to keep frontend and QA unblocked—with a little help from a coding agent to turn the idea into a real tool.
+          </p>
+
+          <hr class="my-10 border-[#2a2a2a]" />
+
+          <p class="mt-8 text-[15px] italic text-[#8c8c8c]">
+            If you’re waiting on APIs or fighting VPN/agent restrictions, maybe a browser-based mock can help you too.
+            <a
+              href="index.html#get-it"
+              class="ml-1 font-medium not-italic text-accent no-underline hover:text-accent-hover"
+              >Try sk-mockAPI →</a
+            >
+          </p>
+        </div>
+
+        <div class="mt-14 pt-8 border-t border-[#2a2a2a]">
+          <a
+            href="index.html"
+            class="inline-flex items-center gap-2 text-sm font-medium text-[#8c8c8c] no-underline hover:text-accent"
+          >
+            ← Back to home
+          </a>
+        </div>
+      </article>
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-[#2a2a2a] px-5 py-6 md:px-6">
+      <div
+        class="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-3"
+      >
+        <div class="flex items-center gap-4">
+          <a
+            href="index.html"
+            class="font-head text-base font-semibold text-[#8c8c8c] no-underline hover:text-accent"
+          >
+            sk-mockAPI
+          </a>
+          <a
+            href="privacy.html"
+            class="text-sm text-[#8c8c8c] no-underline hover:text-accent"
+          >
+            Privacy
+          </a>
+        </div>
+        <p class="m-0 text-sm text-[#8c8c8c]">
+          Developed by <strong class="text-[#e5e5e5]">sachinkondana</strong>
+        </p>
+      </div>
+    </footer>
+  </body>
+</html>
