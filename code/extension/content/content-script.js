@@ -1,24 +1,4 @@
-// Inject interceptor script into page context
-(function() {
-  // Inject immediately, before page scripts run
-  const script = document.createElement('script');
-  script.src = chrome.runtime.getURL('content/interceptor.js');
-  script.onload = function() {
-    console.log('[sk-mockAPI] Interceptor script loaded');
-    this.remove();
-  };
-  script.onerror = function() {
-    console.error('[sk-mockAPI] Failed to load interceptor script');
-  };
-  
-  // Inject as early as possible
-  if (document.head) {
-    document.head.appendChild(script);
-  } else {
-    (document.documentElement || document).appendChild(script);
-  }
-})();
-
+// Interceptor runs in MAIN world and/or via injected script. We push config via postMessage and custom event.
 async function sendConfigToPage() {
   const result = await chrome.storage.local.get(['mockApis', 'mockEnabled', 'apiGroups', 'ungroupedEnabled']);
   const mockApis = result.mockApis || [];
@@ -29,14 +9,23 @@ async function sendConfigToPage() {
   apiGroups.forEach(function (g) {
     groupEnabled[g.id] = g.enabled !== false;
   });
-  window.postMessage({
-    source: 'sk-mock-api',
-    type: 'config',
-    mockApis,
-    mockEnabled,
-    groupEnabled
-  }, '*');
+  const payload = { mockApis, mockEnabled, groupEnabled };
+  window.postMessage({ source: 'sk-mock-api', type: 'config', ...payload }, '*');
+  try {
+    window.dispatchEvent(new CustomEvent('sk-mock-api-config', { detail: payload }));
+  } catch (_) {}
 }
+
+// Push config as soon as content script loads so MAIN world / injected interceptor gets it
+sendConfigToPage();
+
+// Fallback: inject interceptor via script tag (runs in page context) for fetch override
+(function () {
+  const script = document.createElement('script');
+  script.src = chrome.runtime.getURL('content/interceptor.js');
+  script.onload = function () { this.remove(); };
+  (document.head || document.documentElement).appendChild(script);
+})();
 
 // Listen for messages from injected script
 window.addEventListener('message', async function(event) {

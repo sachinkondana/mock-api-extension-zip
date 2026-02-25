@@ -11,17 +11,22 @@
     window.postMessage({ source: 'sk-mock-api', type: 'getConfig' }, '*');
   }
 
+  function applyConfig(data) {
+    if (!data) return;
+    if (data.mockEnabled !== undefined) enabled = data.mockEnabled !== false;
+    if (Array.isArray(data.mockApis)) apiList = data.mockApis;
+    if (data.groupEnabled && typeof data.groupEnabled === 'object') groupEnabled = data.groupEnabled;
+  }
+
   window.addEventListener('message', function(event) {
     if (event.data && event.data.source === 'sk-mock-api') {
-      if (event.data.type === 'config') {
-        enabled = event.data.mockEnabled !== false;
-        apiList = Array.isArray(event.data.mockApis) ? event.data.mockApis : [];
-        groupEnabled = event.data.groupEnabled && typeof event.data.groupEnabled === 'object' ? event.data.groupEnabled : { '__ungrouped__': true };
-      }
-      if (event.data.type === 'enabledStatus') {
-        enabled = event.data.enabled;
-      }
+      if (event.data.type === 'config') applyConfig(event.data);
+      if (event.data.type === 'enabledStatus') enabled = event.data.enabled;
     }
+  });
+
+  window.addEventListener('sk-mock-api-config', function(event) {
+    if (event.detail) applyConfig(event.detail);
   });
 
   // Convert URL pattern with * to regex (one path segment per *)
@@ -77,7 +82,8 @@
   const originalFetch = window.fetch;
   window.fetch = function(...args) {
     const url = args[0];
-    const method = (url instanceof Request ? url.method : 'GET') || 'GET';
+    const options = args[1] && typeof args[1] === 'object' ? args[1] : {};
+    const method = (url instanceof Request ? url.method : (options.method || 'GET')) || 'GET';
 
     if (!enabled) {
       return originalFetch.apply(this, args);
@@ -185,5 +191,7 @@
   };
 
   requestConfig();
-  console.log('[sk-mockAPI] ✅ Interceptor initialized (config-driven)');
+  setTimeout(requestConfig, 50);
+  setTimeout(requestConfig, 200);
+  console.log('[sk-mockAPI] ✅ Interceptor initialized');
 })();
