@@ -38,7 +38,10 @@
   }
 
   function getSectionsForRender() {
-    var ungrouped = mockApis.filter(function (a) {
+    var apisSorted = mockApis.slice().sort(function (a, b) {
+      return (a.order != null ? a.order : 0) - (b.order != null ? b.order : 0);
+    });
+    var ungrouped = apisSorted.filter(function (a) {
       return !a.groupId;
     });
     var groupsOrdered = apiGroups.slice().sort(function (a, b) {
@@ -55,7 +58,7 @@
       sections.push({
         groupId: g.id,
         name: g.name || 'Unnamed group',
-        apis: mockApis.filter(function (a) {
+        apis: apisSorted.filter(function (a) {
           return a.groupId === g.id;
         }),
         enabled: g.enabled !== false,
@@ -80,6 +83,35 @@
       apiGroups = apiGroups.map(function (g) {
         return Object.assign({}, g, { enabled: g.enabled !== false });
       });
+      // Normalize group order: sort by current order (missing = 0), assign 0,1,2,...
+      var groupsSorted = apiGroups.slice().sort(function (a, b) {
+        return (a.order != null ? a.order : 0) - (b.order != null ? b.order : 0);
+      });
+      var groupOrderChanged = false;
+      apiGroups = groupsSorted.map(function (g, i) {
+        var expected = i;
+        if (g.order !== expected) groupOrderChanged = true;
+        return Object.assign({}, g, { order: expected });
+      });
+      if (groupOrderChanged) {
+        saveGroups(apiGroups, function () {});
+      }
+      // Normalize API order: ensure every API has order (use index for missing), sort by order, renumber 0..n-1
+      var apisWithOrder = mockApis.map(function (a, i) {
+        var o = a.order != null ? a.order : i;
+        return Object.assign({}, a, { order: o });
+      });
+      apisWithOrder.sort(function (a, b) {
+        return (a.order != null ? a.order : 0) - (b.order != null ? b.order : 0);
+      });
+      var apiOrderChanged = false;
+      mockApis = apisWithOrder.map(function (a, i) {
+        if (a.order !== i) apiOrderChanged = true;
+        return Object.assign({}, a, { order: i });
+      });
+      if (apiOrderChanged) {
+        saveApis(mockApis, function () {});
+      }
       globalToggle.checked = mockEnabled;
       updateStatusBadge(mockEnabled);
       renderList();
@@ -101,9 +133,16 @@
     storage.set({ apiGroups: groups }, callback || function () {});
   }
 
+  function assignApiOrder(apis) {
+    return apis.map(function (a, i) {
+      return Object.assign({}, a, { order: i });
+    });
+  }
+
   function saveApis(apis, callback) {
-    mockApis = apis;
-    storage.set({ mockApis: apis }, callback || function () {});
+    var ordered = assignApiOrder(apis);
+    mockApis = ordered;
+    storage.set({ mockApis: ordered }, callback || function () {});
   }
 
   function saveEnabled(enabled, callback) {
@@ -113,6 +152,159 @@
       chrome.runtime.sendMessage({ action: 'toggle', enabled: enabled });
       if (callback) callback();
     });
+  }
+
+  var EXPORT_VERSION = 1;
+
+  function downloadJson(filename, obj) {
+    var blob = new Blob([JSON.stringify(obj, null, 2)], { type: 'application/json' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function exportAll() {
+    var payload = {
+      version: EXPORT_VERSION,
+      exportedAt: new Date().toISOString(),
+      mockApis: mockApis,
+      apiGroups: apiGroups,
+    };
+    var date = new Date().toISOString().slice(0, 10);
+    downloadJson('sk-mockapi-rules-' + date + '.json', payload);
+  }
+
+  function exportGroup(groupId) {
+    var group = apiGroups.find(function (g) {
+      return g.id === groupId;
+    });
+    if (!group) return;
+    var apis = mockApis.filter(function (a) {
+      return a.groupId === groupId;
+    });
+    var payload = {
+      version: EXPORT_VERSION,
+      exportedAt: new Date().toISOString(),
+      mockApis: apis,
+      apiGroups: [group],
+    };
+    var sanitized = (group.name || 'group').replace(/[^a-zA-Z0-9-_]/g, '-').slice(0, 30);
+    var date = new Date().toISOString().slice(0, 10);
+    downloadJson('sk-mockapi-group-' + sanitized + '-' + date + '.json', payload);
+  }
+
+  function validateImported(data) {
+    return (
+      data &&
+      typeof data.version === 'number' &&
+      data.version === EXPORT_VERSION &&
+      Array.isArray(data.mockApis) &&
+      Array.isArray(data.apiGroups)
+    );
+  }
+
+  function replaceAllImported(imported) {
+    var groups = (imported.apiGroups || []).map(function (g, i) {
+      return Object.assign({}, g, { order: i, enabled: g.enabled !== false });
+    });
+    var apis = (imported.mockApis || []).map(function (a, i) {
+      return Object.assign({}, a, { order: i });
+    });
+    mockApis = apis;
+    apiGroups = groups;
+    collapsedGroupIds = [];
+    saveCollapsedGroupIds(collapsedGroupIds, function () {});
+    saveGroups(apiGroups, function () {
+      saveApis(mockApis, function () {
+        renderList();
+      });
+    });
+  }
+
+  function generateNewId() {
+    return crypto.randomUUID
+      ? crypto.randomUUID()
+      : 'id-' + Date.now() + '-' + Math.random().toString(36).slice(2);
+  }
+
+  function generateNewGroupId() {
+    return crypto.randomUUID
+      ? crypto.randomUUID()
+      : 'g-' + Date.now() + '-' + Math.random().toString(36).slice(2);
+  }
+
+  function mergeImported(imported) {
+    var oldGroupIdToNew = {};
+    var baseOrder = nextGroupOrder();
+    var newGroups = (imported.apiGroups || []).map(function (g, i) {
+      var newId = generateNewGroupId();
+      oldGroupIdToNew[g.id] = newId;
+      return Object.assign({}, g, {
+        id: newId,
+        order: baseOrder + i,
+        enabled: g.enabled !== false,
+      });
+    });
+    var newApis = (imported.mockApis || []).map(function (a) {
+      var newId = generateNewId();
+      var newGroupId = a.groupId && oldGroupIdToNew[a.groupId] ? oldGroupIdToNew[a.groupId] : undefined;
+      return Object.assign({}, a, { id: newId, groupId: newGroupId });
+    });
+    apiGroups = apiGroups.concat(newGroups);
+    mockApis = mockApis.concat(newApis);
+    var groupsOrdered = apiGroups.slice().sort(function (a, b) {
+      return (a.order != null ? a.order : 0) - (b.order != null ? b.order : 0);
+    });
+    apiGroups = groupsOrdered.map(function (g, i) {
+      return Object.assign({}, g, { order: i });
+    });
+    mockApis = assignApiOrder(mockApis);
+    saveGroups(apiGroups, function () {
+      saveApis(mockApis, function () {
+        renderList();
+      });
+    });
+  }
+
+  function importFromFile(file) {
+    if (!file || !file.name) return;
+    var reader = new FileReader();
+    reader.onload = function () {
+      var text = reader.result;
+      if (typeof text !== 'string') {
+        alert('Invalid or unsupported file');
+        return;
+      }
+      var data;
+      try {
+        data = JSON.parse(text);
+      } catch (e) {
+        alert('Invalid or unsupported file');
+        return;
+      }
+      if (!validateImported(data)) {
+        alert('Invalid or unsupported file');
+        return;
+      }
+      var groups = data.apiGroups || [];
+      var apis = data.mockApis || [];
+      if (groups.length > 1) {
+        var replace = confirm(
+          'Replace all current rules with the imported file?\n\nClick OK to replace, Cancel to merge (add imported rules alongside existing ones).'
+        );
+        if (replace) {
+          replaceAllImported(data);
+        } else {
+          mergeImported(data);
+        }
+      } else {
+        mergeImported(data);
+      }
+    };
+    reader.readAsText(file);
   }
 
   function moveApiAfterCard(draggedId, targetCardId, targetGroupId) {
@@ -214,7 +406,10 @@
         escapeHtml(section.groupId || '') +
         '">+ Add API</button>' +
         (section.groupId
-          ? '<button type="button" class="api-group-delete" data-group-id="' +
+          ? '<button type="button" class="api-group-export" data-group-id="' +
+            escapeHtml(section.groupId) +
+            '" title="Export this group">Export</button>' +
+            '<button type="button" class="api-group-delete" data-group-id="' +
             escapeHtml(section.groupId) +
             '" aria-label="Delete group">' +
             groupDeleteSvg +
@@ -277,6 +472,12 @@
         header.querySelector('.api-group-add-api').addEventListener('click', function () {
           addNewRow(section.groupId);
         });
+        var exportBtn = header.querySelector('.api-group-export');
+        if (exportBtn) {
+          exportBtn.addEventListener('click', function () {
+            exportGroup(section.groupId);
+          });
+        }
         var delBtn = header.querySelector('.api-group-delete');
         if (delBtn) {
           delBtn.addEventListener('click', function () {
@@ -572,6 +773,7 @@
 
   function saveRow(card) {
     const id = card.dataset.id;
+    const existingApi = mockApis.find(function (a) { return a.id === id; });
     const urlPattern = card.querySelector('.row-url').value.trim();
     if (!urlPattern) {
       showResponseStatus(card, 'Enter a URL pattern to save');
@@ -579,11 +781,20 @@
     }
     let responseBody =
       card.querySelector('.response-body-edit').value.trim() || '{}';
+    var responseInvalid = false;
     try {
       JSON.parse(responseBody);
     } catch (e) {
+      responseInvalid = true;
+      responseBody =
+        existingApi &&
+        existingApi.responseBody != null &&
+        existingApi.responseBody !== ''
+          ? typeof existingApi.responseBody === 'string'
+            ? existingApi.responseBody
+            : JSON.stringify(existingApi.responseBody)
+          : '{}';
       showResponseStatus(card, 'Invalid JSON: ' + (e.message || 'parse error'));
-      return;
     }
     const isNew = String(id).indexOf('new-') === 0;
     const payload = {
@@ -611,7 +822,10 @@
       if (isNew) card.dataset.id = payload.id;
       var labelEl = card.querySelector('.card-label');
       if (labelEl) labelEl.textContent = payload.label || '';
-      showResponseStatus(card, 'Saved');
+      showResponseStatus(
+        card,
+        responseInvalid ? 'Saved (fix response JSON)' : 'Saved',
+      );
       setTimeout(function () {
         showResponseStatus(card, '');
       }, 1500);
@@ -685,16 +899,15 @@
   }
 
   function deleteGroup(groupId) {
-    if (!confirm('Delete this group? APIs in it will move to Ungrouped.')) return;
+    if (!confirm('Delete this group and all APIs inside it? This cannot be undone.')) return;
     apiGroups = apiGroups.filter(function (g) {
       return g.id !== groupId;
     });
     collapsedGroupIds = collapsedGroupIds.filter(function (id) {
       return id !== groupId;
     });
-    mockApis = mockApis.map(function (a) {
-      if (a.groupId === groupId) return Object.assign({}, a, { groupId: undefined });
-      return a;
+    mockApis = mockApis.filter(function (a) {
+      return a.groupId !== groupId;
     });
     saveGroups(apiGroups, function () {
       saveApis(mockApis, function () {
@@ -1106,6 +1319,27 @@
   globalToggle.addEventListener('change', function () {
     saveEnabled(this.checked);
   });
+
+  var importFileInput = document.getElementById('importFileInput');
+  var btnImport = document.getElementById('btnImport');
+  var btnExport = document.getElementById('btnExport');
+
+  btnImport.addEventListener('click', function () {
+    if (importFileInput) {
+      importFileInput.value = '';
+      importFileInput.click();
+    }
+  });
+  if (importFileInput) {
+    importFileInput.addEventListener('change', function () {
+      var file = importFileInput.files && importFileInput.files[0];
+      if (file) importFromFile(file);
+      importFileInput.value = '';
+    });
+  }
+  if (btnExport) {
+    btnExport.addEventListener('click', exportAll);
+  }
 
   btnAddGroup.addEventListener('click', addGroup);
 

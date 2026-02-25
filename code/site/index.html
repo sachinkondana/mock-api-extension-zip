@@ -87,6 +87,13 @@
             class="hidden text-sm font-medium text-[#8c8c8c] no-underline hover:text-[#e5e5e5] sm:block"
             >Privacy</a
           >
+          <a
+            href="https://github.com/sachinkondana/mock-api-extension-zip"
+            target="_blank"
+            rel="noopener"
+            class="text-sm font-medium text-[#8c8c8c] no-underline hover:text-[#e5e5e5]"
+            >GitHub</a
+          >
         </nav>
       </div>
     </header>
@@ -120,7 +127,9 @@
           </p>
           <div class="mt-6 flex flex-wrap justify-center gap-3">
             <a
-              href="#get-it"
+              href="https://chromewebstore.google.com/detail/sk-mockapideveloped-by-sa/jmppdgkcebiaacjefehgnkgbiomohfbd"
+              target="_blank"
+              rel="noopener"
               class="inline-flex items-center justify-center rounded-lg bg-accent px-6 py-3 text-base font-semibold text-white no-underline transition hover:bg-accent-hover active:scale-[0.98]"
             >
               Add to Chrome
@@ -144,7 +153,7 @@
                 <span class="h-2.5 w-2.5 rounded-full bg-[#5a5a5a]"></span>
                 <span
                   class="flex-1 text-center font-mono text-xs text-[#8c8c8c]"
-                  >api.example.com/materials/123</span
+                  >api.example.com/news/123</span
                 >
               </div>
               <div class="relative p-4">
@@ -157,7 +166,7 @@
                   class="m-0 overflow-x-auto rounded-md bg-[#0d0d0d] p-4 text-left font-mono text-xs leading-relaxed text-[#e5e5e5] md:text-sm"
                 ><code class="text-[#a8d4a8]">{
   "id": "123",
-  "name": "Sample Material",
+  "name": "Sample News",
   "status": "active"
 }</code></pre>
               </div>
@@ -213,7 +222,7 @@
                 >,
                 <code
                   class="rounded bg-[#0d0d0d] px-1 py-0.5 text-[12px] text-accent"
-                  >/materials/*/spec</code
+                  >/news/*/spec</code
                 >. Only the requests you choose get mocked.
               </p>
             </li>
@@ -306,7 +315,9 @@
             </li>
           </ul>
 
-          <div class="mt-12 rounded-lg border border-[#2a2a2a] bg-card p-6 md:p-8">
+          <div
+            class="mt-12 rounded-lg border border-[#2a2a2a] bg-card p-6 md:p-8"
+          >
             <h3 class="font-head text-lg font-semibold text-white">
               Perfect for QA and testing
             </h3>
@@ -316,24 +327,32 @@
             </p>
             <ul class="mt-4 list-none space-y-2 p-0 text-[13px] text-[#8c8c8c]">
               <li class="flex items-start gap-2">
-                <span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-accent"></span>
+                <span
+                  class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-accent"
+                ></span>
                 Verify flows with edge-case data (empty lists, errors, long
                 text) by mocking responses — no backend setup needed.
               </li>
               <li class="flex items-start gap-2">
-                <span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-accent"></span>
-                Test different scenarios (e.g. success vs. 4xx/5xx) by
-                switching rules or response bodies in the popup.
+                <span
+                  class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-accent"
+                ></span>
+                Test different scenarios (e.g. success vs. 4xx/5xx) by switching
+                rules or response bodies in the popup.
               </li>
               <li class="flex items-start gap-2">
-                <span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-accent"></span>
-                Run consistent test cases across environments without
-                depending on real API data or seed scripts.
+                <span
+                  class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-accent"
+                ></span>
+                Run consistent test cases across environments without depending
+                on real API data or seed scripts.
               </li>
             </ul>
           </div>
 
-          <div class="mt-6 rounded-lg border border-[#2a2a2a] bg-card p-6 md:p-8">
+          <div
+            class="mt-6 rounded-lg border border-[#2a2a2a] bg-card p-6 md:p-8"
+          >
             <h3 class="font-head text-lg font-semibold text-white">
               Perfect for developers
             </h3>
@@ -344,12 +363,16 @@
             </p>
             <ul class="mt-4 list-none space-y-2 p-0 text-[13px] text-[#8c8c8c]">
               <li class="flex items-start gap-2">
-                <span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-accent"></span>
-                Build and integrate frontends against realistic responses
-                while the API is still in progress or unavailable.
+                <span
+                  class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-accent"
+                ></span>
+                Build and integrate frontends against realistic responses while
+                the API is still in progress or unavailable.
               </li>
               <li class="flex items-start gap-2">
-                <span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-accent"></span>
+                <span
+                  class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-accent"
+                ></span>
                 No local servers, no deploy — define URL, method, and JSON in
                 the popup and start developing immediately.
               </li>
@@ -445,8 +468,8 @@
                 </h3>
                 <p class="mt-2 text-[14px] leading-relaxed text-[#8c8c8c]">
                   Click the extension icon to open the popup. Use the global
-                  toggle to enable or disable all mocks. Organize rules in groups
-                  (e.g. Ungrouped, TODO API). Use
+                  toggle to enable or disable all mocks. Organize rules in
+                  groups (e.g. Ungrouped, TODO API). Use
                   <strong class="text-[#e5e5e5]">Add group</strong> or
                   <strong class="text-[#e5e5e5]">+ Add API</strong> to create
                   new groups or rules.
@@ -554,7 +577,7 @@
           </p>
           <div class="mt-5 flex flex-wrap justify-center gap-3">
             <a
-              href="#"
+              href="https://chromewebstore.google.com/detail/sk-mockapideveloped-by-sa/jmppdgkcebiaacjefehgnkgbiomohfbd"
               id="chrome-store-link"
               target="_blank"
               rel="noopener"
@@ -578,7 +601,7 @@
               target="_blank"
               rel="noopener"
               class="font-medium text-accent no-underline hover:text-accent-hover"
-            >Download the extension zip</a
+              >Download the extension zip</a
             >
             from GitHub, or build from the repo and load unpacked from
             <code
@@ -604,6 +627,14 @@
             class="text-sm text-[#8c8c8c] no-underline hover:text-accent"
           >
             Privacy
+          </a>
+          <a
+            href="https://github.com/sachinkondana/mock-api-extension-zip"
+            target="_blank"
+            rel="noopener"
+            class="text-sm text-[#8c8c8c] no-underline hover:text-accent"
+          >
+            GitHub
           </a>
         </div>
         <p class="m-0 text-sm text-[#8c8c8c]">

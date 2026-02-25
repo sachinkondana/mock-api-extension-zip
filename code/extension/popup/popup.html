@@ -441,6 +441,37 @@
         border-color: #ff6b00;
         color: #ff6b00;
       }
+      .btn-import,
+      .btn-export {
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        border: 1px solid #ddd;
+        background: #fff;
+        color: #333;
+      }
+      .btn-import:hover,
+      .btn-export:hover {
+        background: #f5f5f5;
+        border-color: #ff6b00;
+        color: #ff6b00;
+      }
+      .api-group-export {
+        padding: 4px 8px;
+        font-size: 11px;
+        border-radius: 4px;
+        border: 1px solid #ddd;
+        background: #fff;
+        color: #333;
+        cursor: pointer;
+      }
+      .api-group-export:hover {
+        background: #f5f5f5;
+        border-color: #ff6b00;
+        color: #ff6b00;
+      }
       .api-card .expand-btn {
         width: 28px;
         height: 28px;
@@ -917,7 +948,7 @@
     <div class="header">
       <div class="header-left">
         <img
-          src="../icons/sk-mockAPI.png"
+          src="../icons/icon128.png"
           alt=""
           class="header-logo"
           width="32"
@@ -931,6 +962,29 @@
         </label>
       </div>
       <div class="header-actions">
+        <input
+          type="file"
+          accept=".json"
+          id="importFileInput"
+          style="display: none"
+          aria-hidden="true"
+        />
+        <button
+          type="button"
+          class="btn-import"
+          id="btnImport"
+          title="Import rules from JSON"
+        >
+          Import
+        </button>
+        <button
+          type="button"
+          class="btn-export"
+          id="btnExport"
+          title="Export all rules to JSON"
+        >
+          Export
+        </button>
         <button
           type="button"
           class="btn-add-group"
@@ -965,7 +1019,7 @@
               <input
                 type="text"
                 id="editUrl"
-                placeholder="Any domain, e.g. https://auth-service.com/login or /materials/*"
+                placeholder="Any domain, e.g. https://auth-service.com/login or /news/*"
               />
               <button
                 type="button"
@@ -977,7 +1031,7 @@
               </button>
             </div>
             <div class="url-hint">
-              Use any domain. Use * for one path segment (e.g. /materials/* or
+              Use any domain. Use * for one path segment (e.g. /news/* or
               https://api.example.com/users/*).
             </div>
           </div>

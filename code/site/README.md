@@ -29,5 +29,5 @@ Upload the `site/` folder to any static host:
 
 ## Customize
 
-- **Chrome Web Store link**: When the extension is published, set the CTA button href in `index.html` (element with `id="chrome-store-link"`) to your store URL.
+- **Chrome Web Store link**: Set in `index.html` (element with `id="chrome-store-link"`) to [Chrome Web Store](https://chromewebstore.google.com/detail/sk-mockapideveloped-by-sa/jmppdgkcebiaacjefehgnkgbiomohfbd).
 - **Repo link**: Add a “Source” or “GitHub” link in the footer or CTA section pointing to your repository.
