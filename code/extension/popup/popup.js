@@ -719,6 +719,11 @@
     function scheduleAutosave() {
       saveRow(card);
     }
+    var urlSaveTimer;
+    card.querySelector('.row-url').addEventListener('input', function () {
+      clearTimeout(urlSaveTimer);
+      urlSaveTimer = setTimeout(scheduleAutosave, 600);
+    });
     card
       .querySelector('.row-url')
       .addEventListener('change', scheduleAutosave);
@@ -732,6 +737,11 @@
     card
       .querySelector('.row-delay')
       .addEventListener('change', scheduleAutosave);
+    var labelSaveTimer;
+    card.querySelector('.row-label').addEventListener('input', function () {
+      clearTimeout(labelSaveTimer);
+      labelSaveTimer = setTimeout(scheduleAutosave, 600);
+    });
     card
       .querySelector('.row-label')
       .addEventListener('change', scheduleAutosave);
@@ -813,13 +823,14 @@
       payload.id = crypto.randomUUID
         ? crypto.randomUUID()
         : 'id-' + Date.now() + '-' + Math.random().toString(36).slice(2);
+      card.dataset.id = payload.id;
     }
     const list = mockApis.map(function (a) {
-      if (a.id === id) return Object.assign({}, a, payload);
+      if (a.id === id || (isNew && a.id === payload.id))
+        return Object.assign({}, a, payload);
       return a;
     });
     saveApis(list, function () {
-      if (isNew) card.dataset.id = payload.id;
       var labelEl = card.querySelector('.card-label');
       if (labelEl) labelEl.textContent = payload.label || '';
       showResponseStatus(
@@ -1363,6 +1374,16 @@
     if (!e.target.closest('.menu-dropdown') && !e.target.closest('.menu-btn')) {
       document.querySelectorAll('.menu-dropdown.show').forEach(function (d) {
         d.classList.remove('show');
+      });
+    }
+  });
+
+  document.addEventListener('visibilitychange', function () {
+    if (document.visibilityState === 'hidden') {
+      document.querySelectorAll('.api-card').forEach(function (card) {
+        if (card.querySelector('.row-url').value.trim()) {
+          saveRow(card);
+        }
       });
     }
   });
